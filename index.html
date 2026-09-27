@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MARK LIV</title>
+<style>
+:root{
+  --bg:#00060a;--panel:#010d14;--panel2:#010f18;--border:#0d3347;
+  --cyan:#00d4ff;--cyan2:#3a8a9a;--white:#d8f8ff;--green:#00ff88;
+  --orange:#ff6b00;--red:#ff3355;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);
+font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;
+background:linear-gradient(rgba(0,212,255,.025) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,212,255,.025) 1px,transparent 1px);background-size:32px 32px}
+.app{height:100%;display:grid;grid-template-columns:190px 1fr 300px;gap:10px;padding:10px}
+.panel{background:linear-gradient(145deg,rgba(1,15,24,.97),rgba(0,6,10,.97));
+border:1px solid var(--border);box-shadow:0 0 25px rgba(0,212,255,.05),inset 0 0 30px rgba(0,212,255,.02)}
+.left,.right{padding:14px;overflow:auto}.center{min-width:0;display:grid;grid-template-rows:58px 1fr 78px;gap:10px}
+.brand{font-size:22px;font-weight:900;color:var(--cyan);letter-spacing:3px;text-shadow:0 0 15px var(--cyan)}
+.version{font-size:11px;color:var(--cyan2);margin-top:4px}
+.nav{margin-top:25px;display:grid;gap:7px}.nav button,.action{
+background:#011520;border:1px solid var(--border);color:var(--white);padding:10px;text-align:left;
+font:inherit;cursor:pointer}.nav button:hover,.action:hover{border-color:var(--cyan);color:var(--cyan)}
+.section{font-size:10px;color:var(--cyan2);letter-spacing:2px;margin:20px 0 8px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.status{display:flex;gap:8px;align-items:center;font-size:12px}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.clock{color:var(--cyan2);font-size:12px}
+.chat{overflow:auto;padding:18px;scroll-behavior:smooth}
+.msg{max-width:82%;padding:11px 13px;margin:0 0 12px;border:1px solid var(--border);line-height:1.5;white-space:pre-wrap}
+.msg.mark{margin-right:auto;background:rgba(0,212,255,.035);border-left:3px solid var(--cyan)}
+.msg.user{margin-left:auto;background:rgba(255,107,0,.035);border-right:3px solid var(--orange)}
+.meta{font-size:9px;color:var(--cyan2);margin-bottom:5px;letter-spacing:1px}
+.hud{position:relative;display:flex;align-items:center;justify-content:center;height:270px;margin-bottom:20px}
+.hud:before{content:"";position:absolute;width:220px;height:220px;border:1px solid rgba(0,212,255,.3);border-radius:50%;
+box-shadow:0 0 35px rgba(0,212,255,.1),inset 0 0 35px rgba(0,212,255,.05)}
+.face{width:145px;height:180px;border:2px solid var(--cyan);border-radius:48% 48% 45% 45%;
+position:relative;background:radial-gradient(circle at 50% 35%,rgba(0,212,255,.15),rgba(0,0,0,.25) 60%);
+box-shadow:0 0 30px rgba(0,212,255,.2);animation:float 4s ease-in-out infinite}
+.face:before{content:"";position:absolute;left:30px;right:30px;top:78px;height:2px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+.eye{position:absolute;top:67px;width:26px;height:9px;border-top:3px solid var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan)}
+.eye.l{left:27px}.eye.r{right:27px}
+.mouth{position:absolute;left:50%;bottom:42px;transform:translateX(-50%);width:38px;height:8px;border:2px solid var(--cyan);border-radius:50%;animation:speak .8s ease-in-out infinite alternate}
+.ring{position:absolute;inset:-18px;border:1px dashed rgba(0,212,255,.45);border-radius:50%;animation:spin 12s linear infinite}
+@keyframes float{50%{transform:translateY(-5px)}}@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes speak{from{height:5px}to{height:17px}}
+.composer{display:flex;gap:8px;padding:12px}.composer input{flex:1;min-width:0;background:#00090f;border:1px solid var(--border);
+color:var(--white);padding:13px;font:inherit;outline:none}.composer input:focus{border-color:var(--cyan)}
+.send{background:var(--cyan);color:#001018;border:0;padding:0 18px;font-weight:900;cursor:pointer}
+.card{border:1px solid var(--border);padding:12px;margin-bottom:10px;background:rgba(0,212,255,.025)}
+.card h3{font-size:11px;color:var(--cyan);margin:0 0 10px;letter-spacing:1px}.metric{display:flex;justify-content:space-between;margin:8px 0;font-size:11px}
+.bar{height:5px;background:#011520;margin-top:4px}.bar i{display:block;height:100%;width:var(--w);background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.log{height:120px;overflow:auto;font-size:9px;color:var(--cyan2);line-height:1.6}
+.toggle{display:flex;justify-content:space-between;align-items:center}.toggle button{border:1px solid var(--border);background:#001018;color:var(--cyan);padding:5px 9px;cursor:pointer}
+@media(max-width:900px){.app{grid-template-columns:1fr}.left,.right{display:none}.center{height:100vh}.msg{max-width:92%}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="panel left">
+    <div class="brand">MARK</div><div class="version">LIV // WEB HUD</div>
+    <div class="nav">
+      <button onclick="focusChat()">◈ COMMAND</button>
+      <button onclick="showAbout()">◉ SYSTEM</button>
+      <button onclick="clearChat()">⌫ CLEAR CHAT</button>
+      <button onclick="toggleTheme()">⚙ ACCENT</button>
+    </div>
+    <div class="section">CAPABILITIES</div>
+    <div class="card">CHAT<br><small>Browser assistant interface</small></div>
+    <div class="card">VOICE<br><small>Web Speech output/input</small></div>
+    <div class="card">MEMORY<br><small>Saved locally in browser</small></div>
+  </aside>
+
+  <main class="center">
+    <header class="panel header">
+      <div class="status"><span class="dot"></span><span id="state">ONLINE</span></div>
+      <div class="clock" id="clock"></div>
+      <button class="action" onclick="listen()">🎙 MIC</button>
+    </header>
+
+    <section class="panel chat" id="chat">
+      <div class="hud">
+        <div class="ring"></div><div class="face">
+          <span class="eye l"></span><span class="eye r"></span><span class="mouth"></span>
+        </div>
+      </div>
+      <div class="msg mark"><div class="meta">MARK LIV</div>Hello. I am MARK LIV. The web interface is online. What can I help you with?</div>
+    </section>
+
+    <form class="panel composer" id="form">
+      <input id="input" autocomplete="off" placeholder="Enter a command..." />
+      <button class="send">SEND</button>
+    </form>
+  </main>
+
+  <aside class="panel right">
+    <div class="section">SYSTEM STATUS</div>
+    <div class="card">
+      <div class="metric"><span>CPU</span><b id="cpu">--</b></div><div class="bar"><i id="cpuBar" style="--w:34%"></i></div>
+      <div class="metric"><span>MEMORY</span><b id="mem">--</b></div><div class="bar"><i id="memBar" style="--w:52%"></i></div>
+      <div class="metric"><span>NETWORK</span><b id="net">ONLINE</b></div>
+    </div>
+    <div class="section">MEMORY</div>
+    <div class="card">
+      <div class="toggle"><span>LOCAL MEMORY</span><button onclick="remember()">SAVE</button></div>
+      <div id="memory" style="margin-top:10px;color:var(--cyan2);font-size:10px">No saved facts.</div>
+    </div>
+    <div class="section">ACTIVITY</div>
+    <div class="card log" id="log"></div>
+  </aside>
+</div>
+
+<script>
+const chat=document.getElementById('chat'), input=document.getElementById('input'), state=document.getElementById('state');
+const logBox=document.getElementById('log');
+let accent="#00d4ff";
+
+function log(t){const d=document.createElement("div");d.textContent="["+new Date().toLocaleTimeString()+"] "+t;logBox.prepend(d)}
+function add(text,who="mark"){const d=document.createElement("div");d.className="msg "+who;d.innerHTML='<div class="meta">'+(who==="mark"?"MARK LIV":"YOU")+'</div>'+escapeHtml(text);chat.appendChild(d);chat.scrollTop=chat.scrollHeight}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function speak(t){if("speechSynthesis" in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.98;u.pitch=.95;speechSynthesis.speak(u)}}
+function answer(q){
+  const x=q.toLowerCase().trim();
+  if(x.includes("hello")||x.includes("hi")) return "Hello. MARK LIV systems are online.";
+  if(x.includes("time")) return "The current browser time is "+new Date().toLocaleTimeString()+".";
+  if(x.includes("date")) return "Today is "+new Date().toLocaleDateString()+".";
+  if(x.includes("who are you")||x.includes("what are you")) return "I am MARK LIV, a browser-based version of the MARK interface.";
+  if(x.includes("github")) return "This interface is designed to run directly from GitHub Pages as a static website.";
+  if(x.startsWith("remember ")) {localStorage.setItem("markMemory",q.slice(9));loadMemory();return "Saved that locally in this browser."}
+  if(x.includes("clear memory")) {localStorage.removeItem("markMemory");loadMemory();return "Local browser memory cleared."}
+  if(x.includes("help")) return "Try commands such as: hello, what time is it, what are you, remember my favorite color is blue, or clear memory.";
+  return "I received: “"+q+"”. This GitHub Pages version is a static browser interface, so it can respond to built-in commands but cannot directly use the original Python computer-control tools.";
+}
+function send(){
+  const q=input.value.trim();if(!q)return;
+  add(q,"user");input.value="";state.textContent="THINKING";log("Command received");
+  setTimeout(()=>{const a=answer(q);add(a);speak(a);state.textContent="ONLINE";log("Response delivered")},350);
+}
+document.getElementById("form").addEventListener("submit",e=>{e.preventDefault();send()});
+function focusChat(){input.focus()}
+function clearChat(){chat.innerHTML='<div class="hud"><div class="ring"></div><div class="face"><span class="eye l"></span><span class="eye r"></span><span class="mouth"></span></div></div>';log("Chat cleared")}
+function showAbout(){add("MARK LIV Web HUD. This is the browser version of the project. The original Python application contains desktop-only capabilities that GitHub Pages cannot execute.")}
+function toggleTheme(){accent=accent==="#00d4ff"?"#8a5cff":"#00d4ff";document.documentElement.style.setProperty("--cyan",accent);log("Accent changed")}
+function remember(){const v=prompt("What should MARK remember?");if(v){localStorage.setItem("markMemory",v);loadMemory();log("Memory saved")}}
+function loadMemory(){const v=localStorage.getItem("markMemory");document.getElementById("memory").textContent=v||"No saved facts."}
+function listen(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){add("Voice input is not supported by this browser. You can still use the text box.");return}
+  const r=new SR();r.lang="en-US";state.textContent="LISTENING";log("Microphone listening");
+  r.onresult=e=>{input.value=e.results[0][0].transcript;state.textContent="ONLINE";send()};
+  r.onerror=()=>{state.textContent="ONLINE";add("I couldn't access voice input. Check your browser microphone permission.")};
+  r.onend=()=>state.textContent="ONLINE";r.start();
+}
+function tick(){document.getElementById("clock").textContent=new Date().toLocaleTimeString();const c=Math.floor(15+Math.random()*45),m=Math.floor(35+Math.random()*40);document.getElementById("cpu").textContent=c+"%";document.getElementById("mem").textContent=m+"%";document.getElementById("cpuBar").style.setProperty("--w",c+"%");document.getElementById("memBar").style.setProperty("--w",m+"%")}
+loadMemory();setInterval(tick,1000);tick();log("MARK LIV web interface initialized");input.focus();
+</script>
+</body>
+</html>
